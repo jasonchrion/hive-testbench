@@ -11,7 +11,7 @@ this will download the TPC-DS dsgen program, compile it and use maven to build t
 
 To generate the data-sets, you need to run (say, for scale = 200, parallelism = 100)
 
-	$ hadoop  jar target/tpcds-gen-1.0-SNAPSHOT.jar   -d /tmp/store_sales/200/ -p 100 -s 200 
+	$ hadoop  jar target/tpcds-gen-1.0.jar   -d /tmp/store_sales/200/ -p 100 -s 200 
 
 This uses the existing parallelism in the driver.c of TPC-DS without modification and uses it to run the command on multiple machines instead of running in local fork mode.
 

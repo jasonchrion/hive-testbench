@@ -11,7 +11,7 @@ this will download the TPC-h dbgen program, compile it and use maven to build th
 
 To generate the data-sets, you need to run (say, for scale = 200, parallelism = 100)
 
-	$ hadoop  jar target/tpch-gen-1.0-SNAPSHOT.jar   -d /user/hive/external/200/ -p 100 -s 200 
+	$ hadoop  jar target/tpch-gen-1.0.jar   -d /user/hive/external/200/ -p 100 -s 200 
 
 This uses the existing parallelism in the dbgen program without modification and uses it to run the command on multiple machines.
 

@@ -13,7 +13,7 @@ function runcommand {
 	fi
 }
 
-if [ ! -f tpch-gen/target/tpch-gen-1.0-SNAPSHOT.jar ]; then
+if [ ! -f tpch-gen/target/tpch-gen-1.0.jar ]; then
 	echo "Please build the data generator with ./tpch-build.sh first"
 	exit 1
 fi
