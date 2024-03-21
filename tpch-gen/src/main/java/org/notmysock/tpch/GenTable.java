@@ -60,7 +60,7 @@ public class GenTable extends Configured implements Tool {
         String[] remainingArgs = new GenericOptionsParser(getConf(), args).getRemainingArgs();
 
         CommandLineParser parser = new BasicParser();
-        getConf().setInt("io.sort.mb", 4);
+        getConf().setInt("mapreduce.task.io.sort.mb", 4);
         org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
         options.addOption("s","scale", true, "scale");
         options.addOption("t","table", true, "table");

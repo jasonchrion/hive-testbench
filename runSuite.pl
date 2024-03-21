@@ -30,10 +30,13 @@ my $db = {
 	'tpch' => "tpch_flat_orc_$scale"
 };
 
+#my $beeline = "beeline -n root -u 'jdbc:hive2://hive-zookeeper:2181/$db->{${suite}};serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default' ";
+my $beeline = "beeline -n root -u 'jdbc:hive2://localhost:10000/$db->{${suite}}?tez.queue.name=default' ";
+
 print "filename,status,time,rows\n";
 for my $query ( @queries ) {
 	my $logname = "$query.log";
-	my $cmd="echo 'use $db->{${suite}}; source $query;' | hive -i testbench.settings 2>&1  | tee $query.log";
+	my $cmd="$beeline -i testbench.settings -f $query 2>&1 | tee $query.log";
 #	my $cmd="cat $query.log";
 	#print $cmd ; exit;
 	
@@ -45,13 +48,14 @@ for my $query ( @queries ) {
 	my $hiveEnd = time();
 	my $hiveTime = $hiveEnd - $hiveStart;
 	foreach my $line ( @hiveoutput ) {
-		if( $line =~ /Time taken:\s+([\d\.]+)\s+seconds,\s+Fetched:\s+(\d+)\s+row/ ) {
-			print "$query,success,$hiveTime,$2\n"; 
-		} elsif( 
+		#if( $line =~ /Time taken:\s+([\d\.]+)\s+seconds,\s+Fetched:\s+(\d+)\s+row/ ) {
+		if( $line =~ /([\d|No]+)\s+row[s]?\s+selected\s+\(([\d\.]+)\s+seconds\)/ ) {
+			print "$query,success,$hiveTime,$1\n";
+		} elsif(
 			$line =~ /^FAILED: /
-			# || /Task failed!/ 
+			# || /Task failed!/
 			) {
-			print "$query,failed,$hiveTime\n"; 
+			print "$query,failed,$hiveTime\n";
 		} # end if
 	} # end while
 } # end for
