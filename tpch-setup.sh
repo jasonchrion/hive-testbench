@@ -85,10 +85,12 @@ for t in ${TABLES}
 do
 	echo "Optimizing table $t ($i/$total)."
 	COMMAND="$HIVE -i settings/load-${SCHEMA_TYPE}.sql -f ddl-tpch/bin_${SCHEMA_TYPE}/${t}.sql \
-	    --hivevar DB=${DATABASE} \
-	    --hivevar SOURCE=tpch_text_${SCALE} --hivevar BUCKETS=${BUCKETS} \
-            --hivevar SCALE=${SCALE} --hivevar REDUCERS=${REDUCERS} \
-	    --hivevar FILE=orc"
+		--hivevar DB=${DATABASE} \
+		--hivevar SOURCE=tpch_text_${SCALE} \
+		--hivevar BUCKETS=${BUCKETS} \
+		--hivevar SCALE=${SCALE} \
+		--hivevar REDUCERS=${REDUCERS} \
+		--hivevar FILE=orc"
 	runcommand "$COMMAND"
 	if [ $? -ne 0 ]; then
 		echo "Command failed, try 'export DEBUG_SCRIPT=ON' and re-running"
@@ -98,6 +100,6 @@ do
 done
 
 echo "Analyzing table"
-runcommand "$HIVE -i settings/load-${SCHEMA_TYPE}.sql -f ddl-tpch/bin_${SCHEMA_TYPE}/analyze.sql --hivevar DB=${DATABASE};"
+runcommand "$HIVE -i settings/load-${SCHEMA_TYPE}.sql -f ddl-tpch/bin_${SCHEMA_TYPE}/analyze.sql --hivevar DB=${DATABASE}"
 
 echo "Data loaded into database ${DATABASE}."
