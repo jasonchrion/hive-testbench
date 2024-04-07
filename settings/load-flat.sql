@@ -14,4 +14,7 @@ set hive.stats.autogather=true;
 -- set hive.support.concurrency=false;
 -- set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DummyTxnManager;
 
-set hive.optimize.sort.dynamic.partition=true;
+-- hive 3.1.3
+--set hive.optimize.sort.dynamic.partition=true;
+-- hive 4.0.0
+--set hive.optimize.sort.dynamic.partition.threshold=0;
