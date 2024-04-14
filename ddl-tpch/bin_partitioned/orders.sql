@@ -11,7 +11,7 @@ create table orders (O_ORDERKEY BIGINT,
  O_CLERK STRING,
  O_SHIPPRIORITY INT,
  O_COMMENT STRING)
- partitioned by (O_ORDERDATE STRING)
+ partitioned by (O_ORDERDATE DATE)
 stored as ${FILE}
 ;
 
