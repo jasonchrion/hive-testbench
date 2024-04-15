@@ -1,22 +1,14 @@
-drop view revenue_cached;
-drop view max_revenue_cached;
-
-create view revenue_cached as
-select
-  l_suppkey as supplier_no,
-  sum(l_extendedprice * (1 - l_discount)) as total_revenue
-from
-  lineitem
-where
-  l_shipdate >= date '1996-01-01'
-  and l_shipdate < date '1996-04-01'
-group by l_suppkey;
-
-create view max_revenue_cached as
-select
-  max(total_revenue) as max_revenue
-from
-  revenue_cached;
+create view revenue_cached (supplier_no, total_revenue) as
+  select
+    l_suppkey,
+    sum(l_extendedprice * (1 - l_discount))
+  from
+    lineitem
+  where
+    l_shipdate >= date '1996-01-01'
+    and l_shipdate < date '1996-04-01'
+  group by
+    l_suppkey;
 
 select
   s_suppkey,
@@ -26,9 +18,16 @@ select
   total_revenue
 from
   supplier,
-  revenue_cached,
-  max_revenue_cached
+  revenue:s
 where
   s_suppkey = supplier_no
-  and total_revenue = max_revenue 
-order by s_suppkey;
+  and total_revenue = (
+    select
+      max(total_revenue)
+    from
+      revenue_cached
+  )
+order by
+  s_suppkey;
+
+drop view revenue_cached;
