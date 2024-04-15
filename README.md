@@ -28,7 +28,7 @@ All of these steps should be carried out on your Hadoop cluster.
 
 - Step 2: Decide which test suite(s) you want to use.
 
-  hive-testbench comes with data generators and sample queries based on both the TPC-DS and TPC-H benchmarks. You can choose to use either or both of these benchmarks for experiementation. More information about these benchmarks can be found at the Transaction Processing Council homepage.
+  hive-testbench comes with data generators and sample queries based on both the TPC-DS and TPC-H benchmarks. You can choose to use either or both of these benchmarks for experimentation. More information about these benchmarks can be found at the Transaction Processing Council homepage.
 
 - Step 3: Compile and package the appropriate data generator.
 
