@@ -24,31 +24,30 @@ import java.security.*;
 
 
 public class GenTable extends Configured implements Tool {
-	
-	private static enum TableMappings {
-		ALL("all"),
-		CUSTOMERS("c"),
-		SUPPLIERS("s"),
-		NATION("l"),
-		ORDERS("o"),
-		PARTS("p");
-		
-		/*
-		-T c   -- generate cutomers ONLY
-		-T l   -- generate nation/region ONLY
-		-T o   -- generate orders/lineitem ONLY
-		-T p   -- generate parts/partsupp ONLY
-		-T s   -- generate suppliers ONLY
-		*/
-		
-		
-		final String option;
-		
-		TableMappings(String option) {
-			this.option = option;
-		}
-	}
-	
+
+  private static enum TableMappings {
+    ALL("all"),
+    CUSTOMERS("c"),
+    SUPPLIERS("s"),
+    NATION("l"),
+    ORDERS("o"),
+    PARTS("p");
+
+    /*
+    -T c   -- generate cutomers ONLY
+    -T l   -- generate nation/region ONLY
+    -T o   -- generate orders/lineitem ONLY
+    -T p   -- generate parts/partsupp ONLY
+    -T s   -- generate suppliers ONLY
+    */
+
+    final String option;
+    
+    TableMappings(String option) {
+      this.option = option;
+    }
+  }
+
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         int res = ToolRunner.run(conf, new GenTable(), args);
@@ -75,7 +74,7 @@ public class GenTable extends Configured implements Tool {
           f.printHelp("GenTable", options);
           return 1;
         }
-        
+
         int scale = Integer.parseInt(line.getOptionValue("scale"));
         String table = "all";
         if(line.hasOption("table")) {
@@ -173,7 +172,7 @@ public class GenTable extends Configured implements Tool {
           if(table.equals("all")) {
             out.writeBytes(String.format("$DIR/dbgen/tools/dbgen -b $DIR/dbgen/tools/dists.dss -f -s %d -C %d -S %d\n", scale, parallel, i));
           } else {
-        	out.writeBytes(String.format("$DIR/dbgen/tools/dbgen -b $DIR/dbgen/tools/dists.dss -f -s %d -C %d -S %d -T %s\n", scale, parallel, i, table));           
+            out.writeBytes(String.format("$DIR/dbgen/tools/dbgen -b $DIR/dbgen/tools/dists.dss -f -s %d -C %d -S %d -T %s\n", scale, parallel, i, table));           
           }
         }
         out.close();
