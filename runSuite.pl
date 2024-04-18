@@ -30,13 +30,14 @@ my $db = {
 	'tpch' => "tpch_flat_orc_$scale"
 };
 
+#my $beeline = "trino --server http://trino:8080 --catalog hive --schema $db->{${suite}} --ignore-errors --progress --debug ";
 #my $beeline = "beeline -n root -u 'jdbc:hive2://hive-zookeeper:2181/$db->{${suite}};serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default' ";
 my $beeline = "beeline -n root -u 'jdbc:hive2://localhost:10000/$db->{${suite}}?tez.queue.name=default' ";
 
 print "filename,status,time,rows\n";
 for my $query ( @queries ) {
 	my $logname = "$query.log";
-	my $cmd="$beeline -i testbench.settings -f $query 2>&1 | tee $query.log";
+	my $cmd="$beeline -f $query 2>&1 | tee $query.log";
 #	my $cmd="cat $query.log";
 	#print $cmd ; exit;
 	
