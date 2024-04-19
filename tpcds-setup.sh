@@ -114,8 +114,11 @@ do
   COMMAND="$HIVE  -i settings/load-partitioned.sql -f ddl-tpcds/bin_partitioned/${t}.sql \
       --hivevar DB=${DATABASE} \
       --hivevar SCALE=${SCALE} \
-      --hivevar SOURCE=tpcds_text_${SCALE} --hivevar BUCKETS=${BUCKETS} \
-      --hivevar RETURN_BUCKETS=${RETURN_BUCKETS} --hivevar REDUCERS=${REDUCERS} --hivevar FILE=${FORMAT}"
+      --hivevar SOURCE=tpcds_text_${SCALE} \
+      --hivevar BUCKETS=${BUCKETS} \
+      --hivevar RETURN_BUCKETS=${RETURN_BUCKETS} \
+      --hivevar REDUCERS=${REDUCERS} \
+      --hivevar FILE=${FORMAT}"
   echo -e "${t}:\n\t@$COMMAND $SILENCE && echo 'Optimizing table $t ($i/$total).'" >> $LOAD_FILE
   i=`expr $i + 1`
 done
@@ -125,5 +128,8 @@ make -j 1 -f $LOAD_FILE
 
 echo "Loading constraints"
 runcommand "$HIVE -f ddl-tpcds/bin_partitioned/add_constraints.sql --hivevar DB=${DATABASE}"
+
+echo "Analyzing table"
+runcommand "$HIVE -f ddl-tpcds/bin_partitioned/analyze.sql --hivevar DB=${DATABASE}"
 
 echo "Data loaded into database ${DATABASE}."
