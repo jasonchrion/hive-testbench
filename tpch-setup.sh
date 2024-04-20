@@ -68,6 +68,14 @@ echo "Loading text data into external tables."
 runcommand "$HIVE -i settings/load-flat.sql -f ddl-tpch/bin_flat/alltables.sql --hivevar DB=tpch_text_${SCALE} --hivevar LOCATION=${DIR}/${SCALE}"
 
 # Create the optimized tables.
+if [ "X$FORMAT" = "X" ]; then
+  FORMAT=orc
+fi
+
+if [ "X$ICEBERG" = "X" ]; then
+  ICEBERG=""
+fi
+
 i=1
 total=8
 
@@ -77,21 +85,21 @@ else
   SCHEMA_TYPE=partitioned
 fi
 
-DATABASE=tpch_${SCHEMA_TYPE}_orc_${SCALE}
+DATABASE=tpch_${SCHEMA_TYPE}_${FORMAT}_${SCALE}
 MAX_REDUCERS=2600 # ~7 years of data
 REDUCERS=$((test ${SCALE} -gt ${MAX_REDUCERS} && echo ${MAX_REDUCERS}) || echo ${SCALE})
 
 for t in ${TABLES}
 do
   echo "Optimizing table $t ($i/$total)."
-  COMMAND="$HIVE -i settings/load-${SCHEMA_TYPE}.sql -f ddl-tpch/bin_${SCHEMA_TYPE}/${t}.sql \
+  $HIVE -i settings/load-${SCHEMA_TYPE}.sql -f ddl-tpch/bin_${SCHEMA_TYPE}/${t}.sql \
     --hivevar DB=${DATABASE} \
     --hivevar SOURCE=tpch_text_${SCALE} \
     --hivevar BUCKETS=${BUCKETS} \
     --hivevar SCALE=${SCALE} \
     --hivevar REDUCERS=${REDUCERS} \
-    --hivevar FILE=orc"
-  runcommand "$COMMAND"
+    --hivevar FILE=${FORMAT} \
+    --hivevar ICEBERG="${ICEBERG}"
   if [ $? -ne 0 ]; then
     echo "Command failed, try 'export DEBUG_SCRIPT=ON' and re-running"
     exit 1

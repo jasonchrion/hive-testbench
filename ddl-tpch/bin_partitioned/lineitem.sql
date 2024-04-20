@@ -20,7 +20,7 @@ create table lineitem
  L_SHIPMODE STRING,
  L_COMMENT STRING)
  partitioned by (L_SHIPDATE DATE)
-stored as ${FILE}
+${ICEBERG} stored as ${FILE}
 ;
 
 ALTER TABLE lineitem SET TBLPROPERTIES('orc.bloom.filter.columns'='*','orc.compress'='ZLIB');

@@ -4,7 +4,7 @@ use ${DB};
 drop table if exists partsupp;
 
 create table partsupp
-stored as ${FILE}
+${ICEBERG} stored as ${FILE}
 as select * from ${SOURCE}.partsupp
 cluster by PS_SUPPKEY
 ;

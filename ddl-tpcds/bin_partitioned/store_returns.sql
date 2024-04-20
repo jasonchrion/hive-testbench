@@ -26,7 +26,7 @@ create table store_returns
 ,     sr_net_loss decimal(7,2)
 )
 partitioned by (sr_returned_date_sk bigint)
-stored as ${FILE};
+${ICEBERG} stored as ${FILE};
 
 from ${SOURCE}.store_returns sr
 insert overwrite table store_returns partition (sr_returned_date_sk) 

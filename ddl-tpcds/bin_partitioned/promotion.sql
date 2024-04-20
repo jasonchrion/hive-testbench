@@ -4,5 +4,5 @@ use ${DB};
 drop table if exists promotion;
 
 create table promotion
-stored as ${FILE}
+${ICEBERG} stored as ${FILE}
 as select * from ${SOURCE}.promotion;

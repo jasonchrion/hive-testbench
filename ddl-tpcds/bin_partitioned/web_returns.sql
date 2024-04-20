@@ -30,7 +30,7 @@ create table web_returns
 ,     wr_net_loss decimal(7,2)
 )
 partitioned by (wr_returned_date_sk       bigint)
-stored as ${FILE};
+${ICEBERG} stored as ${FILE};
 
 from ${SOURCE}.web_returns wr
 insert overwrite table web_returns partition (wr_returned_date_sk)

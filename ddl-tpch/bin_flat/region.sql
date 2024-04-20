@@ -4,5 +4,5 @@ use ${DB};
 drop table if exists region;
 
 create table region
-stored as ${FILE}
+${ICEBERG} stored as ${FILE}
 as select distinct * from ${SOURCE}.region;

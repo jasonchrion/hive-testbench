@@ -12,7 +12,7 @@ create table orders (O_ORDERKEY BIGINT,
  O_SHIPPRIORITY INT,
  O_COMMENT STRING)
  partitioned by (O_ORDERDATE DATE)
-stored as ${FILE}
+${ICEBERG} stored as ${FILE}
 ;
 
 ALTER TABLE orders SET TBLPROPERTIES('orc.bloom.filter.columns'='*','orc.compress'='ZLIB');

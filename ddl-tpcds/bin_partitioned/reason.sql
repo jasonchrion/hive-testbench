@@ -4,5 +4,5 @@ use ${DB};
 drop table if exists reason;
 
 create table reason
-stored as ${FILE}
+${ICEBERG} stored as ${FILE}
 as select * from ${SOURCE}.reason;
