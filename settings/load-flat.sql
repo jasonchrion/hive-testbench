@@ -18,3 +18,6 @@ set hive.stats.autogather=true;
 --set hive.optimize.sort.dynamic.partition=true;
 -- hive 4.0.0
 --set hive.optimize.sort.dynamic.partition.threshold=0;
+
+-- iceberg
+--set iceberg.mr.schema.auto.conversion=true

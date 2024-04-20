@@ -25,3 +25,6 @@ set hive.map.aggr.hash.min.reduction=0.99;
 --set hive.optimize.sort.dynamic.partition=true;
 -- hive 4.0.0
 --set hive.optimize.sort.dynamic.partition.threshold=0;
+
+-- iceberg
+--set iceberg.mr.schema.auto.conversion=true
