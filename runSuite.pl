@@ -25,10 +25,10 @@ if( $suite eq 'tpcds' ) {
 } # end if
 my @queries = glob '*.sql';
 
-my $format = 'orc';
+my $format = "orc";
 my $db = { 
-  'tpcds' => "tpcds_bin_partitioned_$format_$scale",
-  'tpch' => "tpch_flat_$format_$scale"
+  'tpcds' => "tpcds_bin_partitioned_${format}_${scale}",
+  'tpch' => "tpch_flat_${format}_${scale}"
 };
 
 #my $beeline = "trino --server http://trino:8080 --catalog hive --schema $db->{${suite}} --ignore-errors --progress --debug ";
