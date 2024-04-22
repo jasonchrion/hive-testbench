@@ -117,7 +117,7 @@ done
 for t in ${FACTS}
 do
   tbl=$t;
-  if [ "X$ICEBERG" = "X" ]; then
+  if [ "X$ICEBERG" != "X" ]; then
     tbl=$t"_iceberg"
   fi
   COMMAND="$HIVE  -i settings/load-partitioned.sql -f ddl-tpcds/bin_partitioned/${tbl}.sql \
