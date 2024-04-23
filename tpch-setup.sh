@@ -108,6 +108,6 @@ do
 done
 
 echo "Analyzing table"
-runcommand "$HIVE -i settings/load-${SCHEMA_TYPE}.sql -f ddl-tpch/bin_${SCHEMA_TYPE}/analyze.sql --hivevar DB=${DATABASE}"
+runcommand "$HIVE -i settings/load-${SCHEMA_TYPE}.sql -f ddl-tpch/bin_${SCHEMA_TYPE}/analyze.sql --hivevar DB=${DATABASE} --hivevar REDUCERS=${REDUCERS}"
 
 echo "Data loaded into database ${DATABASE}."
