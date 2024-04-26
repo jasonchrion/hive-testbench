@@ -11,13 +11,16 @@ create table orders (O_ORDERKEY BIGINT,
  O_CLERK STRING,
  O_SHIPPRIORITY INT,
  O_COMMENT STRING)
+using hudi
+tblproperties(
+ hoodie.table.base.file.format='${FILE}',
+ hoodie.embed.timeline.server=false,
+ hoodie.metadata.enable=false
+)
 partitioned by (O_ORDERDATE DATE)
-stored as ${FILE}
 ;
 
-ALTER TABLE orders SET TBLPROPERTIES('orc.bloom.filter.columns'='*','orc.compress'='ZLIB');
-
-INSERT OVERWRITE TABLE orders partition(O_ORDERDATE)
+INSERT OVERWRITE TABLE orders 
 select 
  O_ORDERKEY ,
  O_CUSTKEY ,

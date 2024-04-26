@@ -12,12 +12,11 @@ create table orders (O_ORDERKEY BIGINT,
  O_SHIPPRIORITY INT,
  O_COMMENT STRING)
 partitioned by (O_ORDERDATE DATE)
+stored by iceberg
 stored as ${FILE}
 ;
 
-ALTER TABLE orders SET TBLPROPERTIES('orc.bloom.filter.columns'='*','orc.compress'='ZLIB');
-
-INSERT OVERWRITE TABLE orders partition(O_ORDERDATE)
+INSERT OVERWRITE TABLE orders 
 select 
  O_ORDERKEY ,
  O_CUSTKEY ,

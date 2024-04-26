@@ -12,9 +12,10 @@ my $SCRIPT_NAME = basename( __FILE__ );
 my $SCRIPT_PATH = dirname( __FILE__ );
 
 # MAIN
-dieWithUsage("one or more parameters not defined") unless @ARGV >= 1;
+dieWithUsage("one or more parameters not defined") unless @ARGV >= 3;
 my $suite = shift;
 my $scale = shift || 2;
+my $format = shift || 3;
 dieWithUsage("suite name required") unless $suite eq "tpcds" or $suite eq "tpch";
 
 chdir $SCRIPT_PATH;
@@ -25,23 +26,20 @@ if( $suite eq 'tpcds' ) {
 } # end if
 my @queries = glob '*.sql';
 
-my $format = "orc";
 my $db = { 
-  'tpcds' => "tpcds_bin_partitioned_${format}_${scale}",
-  'tpch' => "tpch_flat_${format}_${scale}"
+  'tpcds' => "tpcds_${format}_${scale}",
+  'tpch' => "tpch_${format}_${scale}"
 };
 
-#my $beeline = "trino --server http://trino:8080 --catalog hive --schema $db->{${suite}} --ignore-errors --progress --debug ";
-#my $beeline = "beeline -n root -u 'jdbc:hive2://hive-zookeeper:2181/$db->{${suite}};serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default' ";
-my $beeline = "beeline -n root -u 'jdbc:hive2://localhost:10000/$db->{${suite}}?tez.queue.name=default' ";
+#my $engine = "trino --server http://trino:8080 --catalog hive --schema $db->{${suite}} --ignore-errors --progress --debug ";
+#my $engine = "/opt/kyuubi/bin/beeline -n root -u 'jdbc:hive2://kyuubi-thrift-binary:10009/$db->{${suite}}' ";
+#my $engine = "beeline -n root -u 'jdbc:hive2://hive-zookeeper:2181/$db->{${suite}};serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default' ";
+my $engine = "beeline -n root -u 'jdbc:hive2://localhost:10000/$db->{${suite}}?tez.queue.name=default' ";
 
 print "filename,status,time,rows\n";
 for my $query ( @queries ) {
   my $logname = "$query.log";
-  my $cmd="$beeline -f $query 2>&1 | tee $query.log";
-  #my $cmd="cat $query.log";
-  #print $cmd ; exit;
-  
+  my $cmd="$engine -f $query 2>&1 | tee $query.log";
   my $hiveStart = time();
 
   my @hiveoutput=`$cmd`;
@@ -63,7 +61,6 @@ for my $query ( @queries ) {
   #} # end foreach
 } # end for
 
-
 sub dieWithUsage(;$) {
   my $err = shift || '';
   if( $err ne '' ) {
@@ -73,7 +70,7 @@ sub dieWithUsage(;$) {
 
   print STDERR <<USAGE;
 ${err}Usage:
-  perl ${SCRIPT_NAME} [tpcds|tpch] [scale]
+  perl ${SCRIPT_NAME} [tpcds|tpch] [scale] [format]
 
 Description:
   This script runs the sample queries and outputs a CSV file of the time it took each query to run.  Also, all hive output is kept as a log file named 'queryXX.sql.log' for each query file of the form 'queryXX.sql'. Defaults to scale of 2.

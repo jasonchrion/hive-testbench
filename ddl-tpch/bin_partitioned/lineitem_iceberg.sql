@@ -20,12 +20,11 @@ create table lineitem
  L_SHIPMODE STRING,
  L_COMMENT STRING)
 partitioned by (L_SHIPDATE DATE)
+stored by iceberg
 stored as ${FILE}
 ;
 
-ALTER TABLE lineitem SET TBLPROPERTIES('orc.bloom.filter.columns'='*','orc.compress'='ZLIB');
-
-INSERT OVERWRITE TABLE lineitem Partition(L_SHIPDATE)
+INSERT OVERWRITE TABLE lineitem 
 select 
  L_ORDERKEY ,
  L_PARTKEY ,
@@ -45,4 +44,3 @@ select
  L_SHIPDATE
  from ${SOURCE}.lineitem
 ;
-

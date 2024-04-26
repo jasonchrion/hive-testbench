@@ -1,6 +1,6 @@
 use ${DB};
 
-analyze table nation compute statistics for columns;
+analyze table nation compute statistics for all columns;
 analyze table region compute statistics for columns;
 analyze table supplier compute statistics for columns;
 analyze table part compute statistics for columns;

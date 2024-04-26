@@ -4,5 +4,6 @@ use ${DB};
 drop table if exists nation;
 
 create table nation
-${ICEBERG} stored as ${FILE}
+stored by iceberg
+stored as ${FILE}
 as select distinct * from ${SOURCE}.nation;

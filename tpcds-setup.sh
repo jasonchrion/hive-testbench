@@ -17,11 +17,6 @@ if [ ! -f tpcds-gen/target/tpcds-gen-1.0.jar ]; then
   echo "Please build the data generator with ./tpcds-build.sh first"
   exit 1
 fi
-which hive > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-  echo "Script must be run where Hive is installed"
-  exit 1
-fi
 
 # Tables in the TPC-DS schema.
 DIMS="date_dim time_dim item customer customer_demographics household_demographics customer_address store promotion warehouse ship_mode reason income_band call_center web_page catalog_page web_site"
@@ -30,13 +25,7 @@ FACTS="store_sales store_returns web_sales web_returns catalog_sales catalog_ret
 # Get the parameters.
 SCALE=$1
 DIR=$2
-if [ "X$BUCKET_DATA" != "X" ]; then
-  BUCKETS=13
-  RETURN_BUCKETS=13
-else
-  BUCKETS=1
-  RETURN_BUCKETS=1
-fi
+BUCKETS=13
 if [ "X$DEBUG_SCRIPT" != "X" ]; then
   set -x
 fi
@@ -70,20 +59,17 @@ hadoop fs -chmod -R 777  ${DIR}/${SCALE}
 
 echo "TPC-DS text data generation complete."
 
-#HIVE="beeline -n root -u 'jdbc:hive2://localhost:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default' "
-HIVE="beeline -n root -u 'jdbc:hive2://localhost:10000?tez.queue.name=default' "
+#ENGINE="/opt/kyuubi/bin/beeline -n root -u 'jdbc:hive2://kyuubi-thrift-binary:10009' "
+#ENGINE="beeline -n root -u 'jdbc:hive2://localhost:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default' "
+ENGINE="beeline -n root -u 'jdbc:hive2://localhost:10000?tez.queue.name=default' "
 
 # Create the text/flat tables as external tables. These will be later be converted to ORCFile.
 echo "Loading text data into external tables."
-runcommand "$HIVE  -i settings/load-flat.sql -f ddl-tpcds/text/alltables.sql --hivevar DB=tpcds_text_${SCALE} --hivevar LOCATION=${DIR}/${SCALE}"
+runcommand "$ENGINE  -i settings/load-flat.sql -f ddl-tpcds/text/alltables.sql --hivevar DB=tpcds_text_${SCALE} --hivevar LOCATION=${DIR}/${SCALE}"
 
-# Create the partitioned and bucketed tables.
+# Create the optimized tables.
 if [ "X$FORMAT" = "X" ]; then
   FORMAT=orc
-fi
-
-if [ "X$ICEBERG" = "X" ]; then
-  ICEBERG=""
 fi
 
 LOAD_FILE="load_${FORMAT}_${SCALE}.mk"
@@ -96,7 +82,7 @@ echo -e "all: ${DIMS} ${FACTS}" > $LOAD_FILE
 
 i=1
 total=24
-DATABASE=tpcds_bin_partitioned_${FORMAT}_${SCALE}
+DATABASE=tpcds_${FORMAT}_${SCALE}
 MAX_REDUCERS=2500 # maximum number of useful reducers for any scale 
 REDUCERS=$((test ${SCALE} -gt ${MAX_REDUCERS} && echo ${MAX_REDUCERS}) || echo ${SCALE})
 
@@ -108,8 +94,7 @@ do
     --hivevar SOURCE=tpcds_text_${SCALE} \
     --hivevar SCALE=${SCALE} \
     --hivevar REDUCERS=${REDUCERS} \
-    --hivevar FILE=${FORMAT} \
-    --hivevar ICEBERG=\"${ICEBERG}\""
+    --hivevar FILE=${FORMAT}"
   echo -e "${t}:\n\t@$COMMAND $SILENCE && echo 'Optimizing table $t ($i/$total).'" >> $LOAD_FILE
   i=`expr $i + 1`
 done
@@ -117,18 +102,19 @@ done
 for t in ${FACTS}
 do
   tbl=$t;
+  if [ "X$HUDI" != "X" ]; then
+    tbl=$t"_hudi"
+  fi
   if [ "X$ICEBERG" != "X" ]; then
     tbl=$t"_iceberg"
   fi
-  COMMAND="$HIVE  -i settings/load-partitioned.sql -f ddl-tpcds/bin_partitioned/${tbl}.sql \
+  COMMAND="$ENGINE -i settings/load-partitioned.sql -f ddl-tpcds/bin_partitioned/${tbl}.sql \
       --hivevar DB=${DATABASE} \
       --hivevar SCALE=${SCALE} \
       --hivevar SOURCE=tpcds_text_${SCALE} \
       --hivevar BUCKETS=${BUCKETS} \
-      --hivevar RETURN_BUCKETS=${RETURN_BUCKETS} \
       --hivevar REDUCERS=${REDUCERS} \
-      --hivevar FILE=${FORMAT} \
-      --hivevar ICEBERG=\"${ICEBERG}\""
+      --hivevar FILE=${FORMAT}"
   echo -e "${t}:\n\t@$COMMAND $SILENCE && echo 'Optimizing table $t ($i/$total).'" >> $LOAD_FILE
   i=`expr $i + 1`
 done
@@ -136,9 +122,14 @@ done
 make -j 1 -f $LOAD_FILE
 
 echo "Loading constraints"
-runcommand "$HIVE -f ddl-tpcds/bin_partitioned/add_constraints.sql --hivevar DB=${DATABASE}"
+runcommand "$ENGINE -f ddl-tpcds/bin_partitioned/add_constraints.sql --hivevar DB=${DATABASE}"
 
 echo "Analyzing table"
-runcommand "$HIVE -f ddl-tpcds/bin_partitioned/analyze.sql --hivevar DB=${DATABASE}"
+
+if [ "X$HUDI" != "X" ]; then
+  runcommand "$ENGINE -f ddl-tpcds/bin_partitioned/analyze_hudi.sql --hivevar DB=${DATABASE} --hivevar REDUCERS=${REDUCERS}"
+else
+  runcommand "$ENGINE -f ddl-tpcds/bin_partitioned/analyze.sql --hivevar DB=${DATABASE} --hivevar REDUCERS=${REDUCERS}"
+fi
 
 echo "Data loaded into database ${DATABASE}."

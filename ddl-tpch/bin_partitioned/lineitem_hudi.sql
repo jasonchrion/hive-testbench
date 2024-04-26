@@ -19,13 +19,16 @@ create table lineitem
  L_SHIPINSTRUCT STRING,
  L_SHIPMODE STRING,
  L_COMMENT STRING)
+using hudi
+tblproperties(
+ hoodie.table.base.file.format='${FILE}',
+ hoodie.embed.timeline.server=false,
+ hoodie.metadata.enable=false
+)
 partitioned by (L_SHIPDATE DATE)
-stored as ${FILE}
 ;
 
-ALTER TABLE lineitem SET TBLPROPERTIES('orc.bloom.filter.columns'='*','orc.compress'='ZLIB');
-
-INSERT OVERWRITE TABLE lineitem Partition(L_SHIPDATE)
+INSERT OVERWRITE TABLE lineitem 
 select 
  L_ORDERKEY ,
  L_PARTKEY ,
@@ -43,6 +46,6 @@ select
  L_SHIPMODE ,
  L_COMMENT ,
  L_SHIPDATE
- from ${SOURCE}.lineitem
+from ${SOURCE}.lineitem
 ;
 

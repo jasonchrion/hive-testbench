@@ -4,6 +4,10 @@ use ${DB};
 drop table if exists region;
 
 create table region
-stored as ${FILE}
-TBLPROPERTIES('orc.bloom.filter.columns'='*','orc.compress'='ZLIB')
+using hudi
+tblproperties(
+ hoodie.table.base.file.format='${FILE}',
+ hoodie.embed.timeline.server=false,
+ hoodie.metadata.enable=false
+)
 as select distinct * from ${SOURCE}.region;
