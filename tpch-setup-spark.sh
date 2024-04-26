@@ -106,7 +106,10 @@ done
 
 make -j 1 -f $LOAD_FILE
 
-echo "Analyzing table"
-runcommand "$ENGINE -f ddl-tpch-spark/bin_partitioned/analyze.sql --hivevar DB=${DATABASE} --hivevar REDUCERS=${REDUCERS}"
+# iceberg v2 DO NOT NEED/SUPPORT analyze
+if [ "X$ICEBERG" = "X" ]; then
+  echo "Analyzing table"
+  runcommand "$ENGINE -f ddl-tpch-spark/bin_partitioned/analyze.sql --hivevar DB=${DATABASE} --hivevar REDUCERS=${REDUCERS}"
+fi
 
 echo "Data loaded into database ${DATABASE}."
