@@ -9,4 +9,3 @@ TBLPROPERTIES('orc.bloom.filter.columns'='*','orc.compress'='ZLIB')
 as select * from ${SOURCE}.partsupp
 cluster by PS_SUPPKEY
 ;
-

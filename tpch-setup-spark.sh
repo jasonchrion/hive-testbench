@@ -80,7 +80,14 @@ echo -e "all: ${TABLES}" > $LOAD_FILE
 
 i=1
 total=8
-DATABASE=tpch_${FORMAT}_${SCALE}
+
+if test $SCALE -le 1000; then 
+  SCHEMA_TYPE=flat
+else
+  SCHEMA_TYPE=partitioned
+fi
+
+DATABASE=tpch_${FORMAT}_${SCALE}_${SCHEMA_TYPE}
 MAX_REDUCERS=2600 # ~7 years of data
 REDUCERS=$((test ${SCALE} -gt ${MAX_REDUCERS} && echo ${MAX_REDUCERS}) || echo ${SCALE})
 
@@ -93,7 +100,7 @@ do
   if [ "X$ICEBERG" != "X" ]; then
     tbl=$t"_iceberg"
   fi
-  COMMAND="$ENGINE -f ddl-tpch-spark/bin_partitioned/${tbl}.sql \
+  COMMAND="$ENGINE -f ddl-tpch-spark/bin_${SCHEMA_TYPE}/${tbl}.sql \
     --hivevar DB=${DATABASE} \
     --hivevar SCALE=${SCALE} \
     --hivevar SOURCE=tpch_text_${SCALE} \
@@ -109,7 +116,7 @@ make -j 1 -f $LOAD_FILE
 # iceberg v2 DO NOT NEED/SUPPORT analyze
 if [ "X$ICEBERG" = "X" ]; then
   echo "Analyzing table"
-  runcommand "$ENGINE -f ddl-tpch-spark/bin_partitioned/analyze.sql --hivevar DB=${DATABASE} --hivevar REDUCERS=${REDUCERS}"
+  runcommand "$ENGINE -f ddl-tpch-spark/bin_${SCHEMA_TYPE}/analyze.sql --hivevar DB=${DATABASE} --hivevar REDUCERS=${REDUCERS}"
 fi
 
 echo "Data loaded into database ${DATABASE}."

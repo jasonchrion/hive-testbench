@@ -3,7 +3,7 @@ use ${DB};
 
 drop table if exists lineitem;
 
-create table lineitem 
+create table lineitem
 (L_ORDERKEY BIGINT,
  L_PARTKEY BIGINT,
  L_SUPPKEY BIGINT,
@@ -19,9 +19,12 @@ create table lineitem
  L_SHIPINSTRUCT STRING,
  L_SHIPMODE STRING,
  L_COMMENT STRING)
-partitioned by (L_SHIPDATE DATE)
 stored by iceberg
 stored as ${FILE}
+tblproperties (
+ 'format-version'='2'
+)
+partitioned by (L_SHIPDATE DATE)
 ;
 
 INSERT OVERWRITE TABLE lineitem 

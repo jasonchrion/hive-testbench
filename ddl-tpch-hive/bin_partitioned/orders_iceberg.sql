@@ -3,7 +3,8 @@ use ${DB};
 
 drop table if exists orders;
 
-create table orders (O_ORDERKEY BIGINT,
+create table orders
+(O_ORDERKEY BIGINT,
  O_CUSTKEY BIGINT,
  O_ORDERSTATUS STRING,
  O_TOTALPRICE DOUBLE,
@@ -11,9 +12,12 @@ create table orders (O_ORDERKEY BIGINT,
  O_CLERK STRING,
  O_SHIPPRIORITY INT,
  O_COMMENT STRING)
-partitioned by (O_ORDERDATE DATE)
 stored by iceberg
 stored as ${FILE}
+tblproperties (
+ 'format-version'='2'
+)
+partitioned by (O_ORDERDATE DATE)
 ;
 
 INSERT OVERWRITE TABLE orders 

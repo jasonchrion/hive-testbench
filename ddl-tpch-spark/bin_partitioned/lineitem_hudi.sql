@@ -48,4 +48,3 @@ select
  L_SHIPDATE
 from ${SOURCE}.lineitem
 ;
-

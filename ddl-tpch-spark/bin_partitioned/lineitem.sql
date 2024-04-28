@@ -3,7 +3,7 @@ use ${DB};
 
 drop table if exists lineitem;
 
-create table lineitem 
+create table lineitem
 (L_ORDERKEY BIGINT,
  L_PARTKEY BIGINT,
  L_SUPPKEY BIGINT,
@@ -45,4 +45,3 @@ select
  L_SHIPDATE
  from ${SOURCE}.lineitem
 ;
-
