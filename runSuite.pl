@@ -26,15 +26,19 @@ if( $suite eq 'tpcds' ) {
 } # end if
 my @queries = glob '*.sql';
 
-my $db = { 
-  'tpcds' => "tpcds_${format}_${scale}",
-  'tpch' => "tpch_${format}_${scale}"
-};
+my $db = "${suite}_${format}_${scale}"
+if( $suite eq 'tpch' ) {
+  if( $scale <= 1000 ) {
+    $db = "${suite}_${format}_${scale}_flat"
+  } else {
+    $db = "${suite}_${format}_${scale}_partitioned"
+  }
+}
 
-#my $engine = "trino --server http://trino:8080 --catalog hive --schema $db->{${suite}} --ignore-errors --progress --debug ";
-#my $engine = "/opt/kyuubi/bin/beeline -n root -u 'jdbc:hive2://kyuubi-thrift-binary:10009/$db->{${suite}}' ";
-#my $engine = "beeline -n root -u 'jdbc:hive2://hive-zookeeper:2181/$db->{${suite}};serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default' ";
-my $engine = "beeline -n root -u 'jdbc:hive2://localhost:10000/$db->{${suite}}?tez.queue.name=default' ";
+#my $engine = "trino --server http://trino:8080 --catalog hive --schema ${db} --ignore-errors --progress --debug ";
+#my $engine = "/opt/kyuubi/bin/beeline -n root -u 'jdbc:hive2://kyuubi-thrift-binary:10009/${db}' ";
+#my $engine = "beeline -n root -u 'jdbc:hive2://hive-zookeeper:2181/${db};serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default' ";
+my $engine = "beeline -n root -u 'jdbc:hive2://localhost:10000/${db}?tez.queue.name=default' ";
 
 print "filename,status,time,rows\n";
 for my $query ( @queries ) {
