@@ -9,6 +9,6 @@ stored as ${FILE}
 tblproperties (
  'format-version'='2'
 )
-select * from ${SOURCE}.lineitem
+as select * from ${SOURCE}.lineitem
 cluster by L_SHIPDATE
 ;

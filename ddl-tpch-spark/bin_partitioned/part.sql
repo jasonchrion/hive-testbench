@@ -5,7 +5,10 @@ drop table if exists part;
 
 create table part
 stored as ${FILE}
-TBLPROPERTIES('orc.bloom.filter.columns'='*','orc.compress'='ZLIB')
+tblproperties(
+ 'orc.bloom.filter.columns'='*',
+ 'orc.compress'='ZLIB'
+)
 as select * from ${SOURCE}.part
 cluster by p_brand
 ;

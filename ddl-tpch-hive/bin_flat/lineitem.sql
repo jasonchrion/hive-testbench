@@ -5,6 +5,6 @@ drop table if exists lineitem;
 
 create table lineitem
 stored as ${FILE}
-select * from ${SOURCE}.lineitem
+as select * from ${SOURCE}.lineitem
 cluster by L_SHIPDATE
 ;
