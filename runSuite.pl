@@ -26,12 +26,12 @@ if( $suite eq 'tpcds' ) {
 } # end if
 my @queries = glob '*.sql';
 
-my $db = "${suite}_${format}_${scale}"
+my $db = "${suite}_${format}_${scale}";
 if( $suite eq 'tpch' ) {
   if( $scale <= 1000 ) {
-    $db = "${suite}_${format}_${scale}_flat"
+    $db = "${suite}_${format}_${scale}_flat";
   } else {
-    $db = "${suite}_${format}_${scale}_partitioned"
+    $db = "${suite}_${format}_${scale}_partitioned";
   }
 }
 
