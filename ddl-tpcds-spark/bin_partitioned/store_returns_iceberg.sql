@@ -32,8 +32,7 @@ tblproperties(
 partitioned by (sr_returned_date_sk bigint)
 ;
 
-from ${SOURCE}.store_returns sr
-insert overwrite table store_returns partition (sr_returned_date_sk) 
+insert overwrite table store_returns 
 select
         sr.sr_return_time_sk,
         sr.sr_item_sk,
@@ -55,4 +54,5 @@ select
         sr.sr_store_credit,
         sr.sr_net_loss,
         sr.sr_returned_date_sk
+from ${SOURCE}.store_returns sr
 ;

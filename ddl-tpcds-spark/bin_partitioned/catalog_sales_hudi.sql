@@ -48,8 +48,7 @@ tblproperties(
 partitioned by (cs_sold_date_sk bigint)
 ;
 
-from ${SOURCE}.catalog_sales cs
-insert overwrite table catalog_sales partition (cs_sold_date_sk) 
+insert overwrite table catalog_sales 
 select
         cs.cs_sold_time_sk,
         cs.cs_ship_date_sk,
@@ -85,4 +84,5 @@ select
         cs.cs_net_paid_inc_ship_tax,
         cs.cs_net_profit,
         cs.cs_sold_date_sk
+from ${SOURCE}.catalog_sales cs
 ;

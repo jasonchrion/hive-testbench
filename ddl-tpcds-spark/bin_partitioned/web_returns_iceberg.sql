@@ -36,8 +36,7 @@ tblproperties(
 partitioned by (wr_returned_date_sk       bigint)
 ;
 
-from ${SOURCE}.web_returns wr
-insert overwrite table web_returns partition (wr_returned_date_sk)
+insert overwrite table web_returns 
 select
         wr.wr_returned_time_sk,
         wr.wr_item_sk,
@@ -63,4 +62,5 @@ select
         wr.wr_account_credit,
         wr.wr_net_loss,
         wr.wr_returned_date_sk
+from ${SOURCE}.web_returns wr
 ;

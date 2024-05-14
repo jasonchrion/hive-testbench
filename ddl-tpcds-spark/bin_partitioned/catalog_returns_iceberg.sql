@@ -39,8 +39,7 @@ tblproperties(
 partitioned by (cr_returned_date_sk bigint)
 ;
 
-from ${SOURCE}.catalog_returns cr
-insert overwrite table catalog_returns partition(cr_returned_date_sk) 
+insert overwrite table catalog_returns 
 select
         cr.cr_returned_time_sk,
         cr.cr_item_sk,
@@ -69,4 +68,5 @@ select
         cr.cr_store_credit,
         cr.cr_net_loss,
         cr.cr_returned_date_sk
+from ${SOURCE}.catalog_returns cr
 ;

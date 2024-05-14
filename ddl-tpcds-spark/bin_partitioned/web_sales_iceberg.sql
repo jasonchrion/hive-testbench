@@ -46,8 +46,7 @@ tblproperties(
 partitioned by (ws_sold_date_sk           bigint)
 ;
 
-from ${SOURCE}.web_sales ws
-insert overwrite table web_sales partition (ws_sold_date_sk) 
+insert overwrite table web_sales 
 select
         ws.ws_sold_time_sk,
         ws.ws_ship_date_sk,
@@ -83,4 +82,5 @@ select
         ws.ws_net_paid_inc_ship_tax,
         ws.ws_net_profit,
         ws.ws_sold_date_sk
+from ${SOURCE}.web_sales ws
 ;
