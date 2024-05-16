@@ -92,7 +92,7 @@ do
   if [ "X$ICEBERG" != "X" ]; then
     tbl=$t"_iceberg"
   fi
-  COMMAND="$HIVE -i settings/load-partitioned.sql -f ddl-tpcds-hive/bin_partitioned/${tbl}.sql \
+  COMMAND="$ENGINE -i settings/load-partitioned.sql -f ddl-tpcds-hive/bin_partitioned/${tbl}.sql \
     --hivevar DB=${DATABASE} \
     --hivevar SOURCE=tpcds_text_${SCALE} \
     --hivevar SCALE=${SCALE} \
