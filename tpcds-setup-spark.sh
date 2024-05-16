@@ -127,8 +127,11 @@ done
 
 make -j 1 -f $LOAD_FILE
 
-echo "Loading constraints"
-runcommand "$ENGINE -f ddl-tpcds-spark/bin_partitioned/add_constraints.sql --hivevar DB=${DATABASE}"
+# iceberg v2 DO NOT NEED/SUPPORT constraint
+if [ "X$ICEBERG" = "X" ]; then
+  echo "Loading constraints"
+  runcommand "$ENGINE -f ddl-tpcds-spark/bin_partitioned/add_constraints.sql --hivevar DB=${DATABASE}"
+fi
 
 # iceberg v2 DO NOT NEED/SUPPORT analyze
 if [ "X$ICEBERG" = "X" ]; then
