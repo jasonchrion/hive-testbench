@@ -6,8 +6,6 @@ drop table if exists call_center;
 create table call_center
 using hudi
 tblproperties(
- hoodie.table.base.file.format='${FILE}',
- hoodie.embed.timeline.server=false,
- hoodie.metadata.enable=false
+ hoodie.table.base.file.format='${FILE}'
 )
 as select * from ${SOURCE}.call_center;

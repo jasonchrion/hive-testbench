@@ -21,9 +21,7 @@ create table lineitem
  L_COMMENT STRING)
 using hudi
 tblproperties(
- hoodie.table.base.file.format='${FILE}',
- hoodie.embed.timeline.server=false,
- hoodie.metadata.enable=false
+ hoodie.table.base.file.format='${FILE}'
 )
 partitioned by (L_SHIPDATE DATE)
 ;

@@ -6,8 +6,6 @@ drop table if exists nation;
 create table nation
 using hudi
 tblproperties(
- hoodie.table.base.file.format='${FILE}',
- hoodie.embed.timeline.server=false,
- hoodie.metadata.enable=false
+ hoodie.table.base.file.format='${FILE}'
 )
 as select distinct * from ${SOURCE}.nation;

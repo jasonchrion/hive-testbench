@@ -30,9 +30,7 @@ create table store_sales
 )
 using hudi
 tblproperties(
- hoodie.table.base.file.format='${FILE}',
- hoodie.embed.timeline.server=false,
- hoodie.metadata.enable=false
+ hoodie.table.base.file.format='${FILE}'
 )
 partitioned by (ss_sold_date_sk bigint)
 ;

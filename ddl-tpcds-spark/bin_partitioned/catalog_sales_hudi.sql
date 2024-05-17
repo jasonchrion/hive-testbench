@@ -41,9 +41,7 @@ create table catalog_sales
 )
 using hudi
 tblproperties(
- hoodie.table.base.file.format='${FILE}',
- hoodie.embed.timeline.server=false,
- hoodie.metadata.enable=false
+ hoodie.table.base.file.format='${FILE}'
 )
 partitioned by (cs_sold_date_sk bigint)
 ;
