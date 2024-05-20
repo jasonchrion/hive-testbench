@@ -6,9 +6,7 @@ drop table if exists supplier;
 create table supplier
 using hudi
 tblproperties(
- hoodie.table.base.file.format='${FILE}',
- hoodie.embed.timeline.server=false,
- hoodie.metadata.enable=false
+ hoodie.table.base.file.format='${FILE}'
 )
 as select * from ${SOURCE}.supplier
 cluster by s_nationkey, s_suppkey

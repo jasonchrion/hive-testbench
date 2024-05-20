@@ -14,9 +14,7 @@ create table orders
  O_COMMENT STRING)
 using hudi
 tblproperties(
- hoodie.table.base.file.format='${FILE}',
- hoodie.embed.timeline.server=false,
- hoodie.metadata.enable=false
+ hoodie.table.base.file.format='${FILE}'
 )
 partitioned by (O_ORDERDATE DATE)
 ;
