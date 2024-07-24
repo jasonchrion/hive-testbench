@@ -13,7 +13,14 @@ function runcommand {
   fi
 }
 
-if [ ! -f tpcds-gen/target/tpcds-gen-1.0.jar ]; then
+PRG="$0"
+PRGDIR=`dirname "$PRG"`
+
+cd $PRGDIR
+TESTBENCH_HOME=`pwd`
+export TESTBENCH_HOME
+
+if [ ! -f ${TESTBENCH_HOME}/tpcds-gen/target/tpcds-gen-1.0.jar ]; then
   echo "Please build the data generator with ./tpcds-build.sh first"
   exit 1
 fi
@@ -47,7 +54,7 @@ hdfs dfs -mkdir -p ${DIR}
 hdfs dfs -ls ${DIR}/${SCALE} > /dev/null
 if [ $? -ne 0 ]; then
   echo "Generating data at scale factor $SCALE."
-  (cd tpcds-gen; hadoop jar target/*.jar -d ${DIR}/${SCALE}/ -s ${SCALE})
+  (cd ${TESTBENCH_HOME}/tpcds-gen; hadoop jar target/*.jar -d ${DIR}/${SCALE}/ -s ${SCALE})
 fi
 hdfs dfs -ls ${DIR}/${SCALE} > /dev/null
 if [ $? -ne 0 ]; then
@@ -59,12 +66,12 @@ hadoop fs -chmod -R 777  ${DIR}/${SCALE}
 
 echo "TPC-DS text data generation complete."
 
-#ENGINE="beeline -n root -u 'jdbc:hive2://localhost:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default' "
-ENGINE="beeline -n root -u 'jdbc:hive2://localhost:10000?tez.queue.name=default' "
+#ENGINE="/opt/hive/bin/beeline -n root -u 'jdbc:hive2://localhost:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default' "
+ENGINE="/opt/hive/bin/beeline -n root -u 'jdbc:hive2://localhost:10000?tez.queue.name=default' "
 
 # Create the text/flat tables as external tables. These will be later be converted to ORCFile.
 echo "Loading text data into external tables."
-runcommand "$ENGINE  -i settings/load-flat.sql -f ddl-tpcds-hive/text/alltables.sql --hivevar DB=tpcds_text_${SCALE} --hivevar LOCATION=${DIR}/${SCALE}"
+runcommand "$ENGINE  -i ${TESTBENCH_HOME}/settings/load-flat.sql -f ${TESTBENCH_HOME}/ddl-tpcds-hive/text/alltables.sql --hivevar DB=tpcds_text_${SCALE} --hivevar LOCATION=${DIR}/${SCALE}"
 
 # Create the optimized tables.
 if [ "X$FORMAT" = "X" ]; then
@@ -92,7 +99,7 @@ do
   if [ "X$ICEBERG" != "X" ]; then
     tbl=$t"_iceberg"
   fi
-  COMMAND="$ENGINE -i settings/load-partitioned.sql -f ddl-tpcds-hive/bin_partitioned/${tbl}.sql \
+  COMMAND="$ENGINE -i ${TESTBENCH_HOME}/settings/load-partitioned.sql -f ${TESTBENCH_HOME}/ddl-tpcds-hive/bin_partitioned/${tbl}.sql \
     --hivevar DB=${DATABASE} \
     --hivevar SOURCE=tpcds_text_${SCALE} \
     --hivevar SCALE=${SCALE} \
@@ -108,7 +115,7 @@ do
   if [ "X$ICEBERG" != "X" ]; then
     tbl=$t"_iceberg"
   fi
-  COMMAND="$ENGINE -i settings/load-partitioned.sql -f ddl-tpcds-hive/bin_partitioned/${tbl}.sql \
+  COMMAND="$ENGINE -i ${TESTBENCH_HOME}/settings/load-partitioned.sql -f ${TESTBENCH_HOME}/ddl-tpcds-hive/bin_partitioned/${tbl}.sql \
       --hivevar DB=${DATABASE} \
       --hivevar SCALE=${SCALE} \
       --hivevar SOURCE=tpcds_text_${SCALE} \
@@ -122,9 +129,9 @@ done
 make -j 1 -f $LOAD_FILE
 
 echo "Loading constraints"
-runcommand "$ENGINE -f ddl-tpcds-hive/bin_partitioned/add_constraints.sql --hivevar DB=${DATABASE}"
+runcommand "$ENGINE -f ${TESTBENCH_HOME}/ddl-tpcds-hive/bin_partitioned/add_constraints.sql --hivevar DB=${DATABASE}"
 
 echo "Analyzing table"
-runcommand "$ENGINE -f ddl-tpcds-hive/bin_partitioned/analyze.sql --hivevar DB=${DATABASE} --hivevar REDUCERS=${REDUCERS}"
+runcommand "$ENGINE -f ${TESTBENCH_HOME}/ddl-tpcds-hive/bin_partitioned/analyze.sql --hivevar DB=${DATABASE} --hivevar REDUCERS=${REDUCERS}"
 
 echo "Data loaded into database ${DATABASE}."
